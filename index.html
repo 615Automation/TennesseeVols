@@ -4,6 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tennessee Vols Sports Trivia</title>
+
+<!-- Icons & PWA -->
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FF8200">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vols Trivia">
+
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -868,6 +879,7 @@ function renderQuestion() {
   $progScr.textContent = `SCORE: ${score}`;
 
   // Question
+  const shuffledOpts = shuffle(q.opts);
   $qArea.className = 'animate-slide-up';
   $qArea.innerHTML = `
     <div class="category-pill ${meta.pill}">
@@ -875,7 +887,7 @@ function renderQuestion() {
     </div>
     <h2 class="question-text">${q.q}</h2>
     <div class="options-grid">
-      ${q.opts.map((o, i) => `
+      ${shuffledOpts.map((o, i) => `
         <button class="option-btn" data-opt="${o}">
           <span class="option-letter">${String.fromCharCode(65 + i)}</span>
           <span>${o}</span>
