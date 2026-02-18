@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tennessee Vols Sports Trivia</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --vol-orange: #FF8200;
+    --vol-dark-orange: #E06800;
+    --vol-deep: #B85400;
+    --smokey-gray: #58595B;
+    --dark: #1A1611;
+    --warm-cream: #FDF8F0;
+    --warm-cream-2: #F9F0E3;
+    --correct-green: #2E7D32;
+    --correct-bg: #E8F5E9;
+    --wrong-red: #C62828;
+    --wrong-bg: #FFEBEE;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Lora', serif;
+    background: var(--dark);
+    color: var(--dark);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* --- Stadium atmosphere background --- */
+  .app-bg {
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,130,0,0.12) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 100%, rgba(255,130,0,0.06) 0%, transparent 40%),
+      var(--warm-cream);
+    position: relative;
+  }
+
+  /* Checkerboard endzone strip */
+  .endzone-strip {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: repeating-linear-gradient(90deg, var(--vol-orange) 0px, var(--vol-orange) 12px, #FFF 12px, #FFF 24px);
+    z-index: 100;
+  }
+  .endzone-strip-bottom {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: repeating-linear-gradient(90deg, var(--vol-orange) 0px, var(--vol-orange) 12px, #FFF 12px, #FFF 24px);
+    z-index: 100;
+  }
+
+  /* Yard-line subtle texture */
+  .yard-lines {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 98px,
+      rgba(255,130,0,0.03) 98px,
+      rgba(255,130,0,0.03) 100px
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 740px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* --- Animations --- */
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(32px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  @keyframes confetti-fall {
+    0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(60px) rotate(360deg); opacity: 0; }
+  }
+  .animate-slide-up { animation: slideUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .animate-fade { animation: fadeIn 0.4s ease both; }
+  .animate-scale { animation: scaleIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+  .delay-1 { animation-delay: 0.08s; }
+  .delay-2 { animation-delay: 0.16s; }
+  .delay-3 { animation-delay: 0.24s; }
+  .delay-4 { animation-delay: 0.32s; }
+  .delay-5 { animation-delay: 0.4s; }
+
+  /* --- Start Screen --- */
+  .start-screen { text-align: center; padding-top: 40px; }
+
+  .logo-container {
+    width: 140px; height: 140px;
+    margin: 0 auto 28px;
+    background: linear-gradient(135deg, var(--vol-orange), var(--vol-dark-orange));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 64px;
+    box-shadow:
+      0 8px 40px rgba(255,130,0,0.3),
+      0 0 0 4px rgba(255,255,255,0.8),
+      0 0 0 8px rgba(255,130,0,0.2);
+    animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .main-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(44px, 8vw, 72px);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: var(--vol-orange);
+    line-height: 1;
+    margin-bottom: 4px;
+    animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+  }
+
+  .sub-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(16px, 3vw, 24px);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 8px;
+    color: var(--smokey-gray);
+    margin-bottom: 40px;
+    animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+  }
+
+  /* Category cards */
+  .category-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    max-width: 440px;
+    margin: 0 auto 40px;
+  }
+
+  .cat-card {
+    padding: 16px 12px;
+    border-radius: 14px;
+    background: white;
+    border: 1px solid rgba(255,130,0,0.1);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .cat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255,130,0,0.12);
+  }
+  .cat-icon { font-size: 24px; margin-bottom: 6px; }
+  .cat-name {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px;
+    color: var(--smokey-gray);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .cat-pct {
+    font-family: 'Oswald', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--vol-orange);
+  }
+
+  /* Question count selector */
+  .count-section { margin-bottom: 36px; }
+  .count-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 13px;
+    color: #AAA;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .count-btns { display: flex; justify-content: center; gap: 10px; }
+  .count-btn {
+    padding: 10px 28px;
+    border-radius: 100px;
+    border: 2px solid #E0D8CE;
+    background: white;
+    color: var(--smokey-gray);
+    font-family: 'Oswald', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .count-btn:hover { border-color: var(--vol-orange); color: var(--vol-orange); }
+  .count-btn.active {
+    background: var(--vol-orange);
+    border-color: var(--vol-orange);
+    color: white;
+    box-shadow: 0 4px 16px rgba(255,130,0,0.3);
+  }
+
+  /* Primary CTA */
+  .btn-primary {
+    display: inline-block;
+    padding: 18px 64px;
+    background: linear-gradient(135deg, var(--vol-orange), var(--vol-dark-orange));
+    color: white;
+    border: none;
+    border-radius: 100px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 6px 28px rgba(255,130,0,0.35);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%; width: 200%; height: 100%;
+    background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.15) 50%, transparent 75%);
+    animation: shimmer 3s ease-in-out infinite;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 10px 36px rgba(255,130,0,0.45);
+  }
+  .btn-primary:active { transform: translateY(0) scale(0.98); }
+
+  /* --- Playing Screen --- */
+  .progress-bar-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+  .progress-track {
+    flex: 1;
+    height: 8px;
+    background: rgba(255,130,0,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--vol-orange), #FFB74D);
+    border-radius: 4px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .progress-text {
+    font-family: 'Oswald', sans-serif;
+    font-size: 14px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .progress-count { color: var(--vol-orange); }
+  .progress-score { color: var(--smokey-gray); }
+
+  /* Category pill */
+  .category-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 18px;
+    border-radius: 100px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .pill-football { background: var(--vol-orange); color: white; }
+  .pill-mbball { background: var(--smokey-gray); color: white; }
+  .pill-baseball { background: white; color: var(--vol-orange); border: 2px solid var(--vol-orange); }
+  .pill-wbball { background: var(--vol-orange); color: white; }
+
+  .question-text {
+    font-family: 'Lora', serif;
+    font-size: clamp(20px, 3.8vw, 28px);
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1.4;
+    margin-bottom: 32px;
+  }
+
+  /* Options */
+  .options-grid { display: grid; gap: 12px; }
+
+  .option-btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 22px;
+    background: white;
+    border: 2px solid #E8E2D8;
+    border-radius: 14px;
+    cursor: pointer;
+    text-align: left;
+    font-family: 'Lora', serif;
+    font-size: 17px;
+    color: #333;
+    transition: all 0.2s ease;
+    outline: none;
+    position: relative;
+    overflow: hidden;
+  }
+  .option-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 0;
+    background: rgba(255,130,0,0.05);
+    transition: width 0.2s ease;
+  }
+  .option-btn:hover:not(.answered) {
+    border-color: var(--vol-orange);
+    transform: translateX(4px);
+    box-shadow: 0 4px 16px rgba(255,130,0,0.1);
+  }
+  .option-btn:hover:not(.answered)::before { width: 100%; }
+
+  .option-btn.answered { cursor: default; }
+  .option-btn.correct {
+    background: var(--correct-bg);
+    border-color: var(--correct-green);
+    color: var(--correct-green);
+  }
+  .option-btn.wrong {
+    background: var(--wrong-bg);
+    border-color: var(--wrong-red);
+    color: var(--wrong-red);
+  }
+  .option-btn.dimmed { opacity: 0.45; }
+
+  .option-letter {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    flex-shrink: 0;
+    background: rgba(255,130,0,0.08);
+    color: var(--vol-orange);
+    transition: all 0.2s ease;
+  }
+  .correct .option-letter { background: var(--correct-green); color: white; }
+  .wrong .option-letter { background: var(--wrong-red); color: white; }
+
+  /* Feedback message */
+  .feedback {
+    margin-top: 20px;
+    padding: 16px 22px;
+    border-radius: 12px;
+    font-family: 'Lora', serif;
+    font-size: 16px;
+    animation: fadeIn 0.3s ease;
+  }
+  .feedback-correct { background: rgba(76,175,80,0.08); color: var(--correct-green); }
+  .feedback-wrong { background: rgba(239,83,80,0.08); color: var(--wrong-red); }
+
+  /* Next button */
+  .btn-next {
+    padding: 14px 44px;
+    background: var(--vol-orange);
+    color: white;
+    border: none;
+    border-radius: 100px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .btn-next:hover { background: var(--vol-dark-orange); transform: scale(1.03); }
+
+  .hint-text {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #BBB;
+    font-family: 'Oswald', sans-serif;
+    letter-spacing: 1px;
+  }
+
+  /* --- Results Screen --- */
+  .results-screen { text-align: center; padding-top: 20px; }
+
+  .result-emoji { font-size: 80px; margin-bottom: 12px; }
+
+  .result-score {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(48px, 8vw, 72px);
+    font-weight: 700;
+    color: var(--vol-orange);
+    letter-spacing: 2px;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .result-pct {
+    font-family: 'Oswald', sans-serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--smokey-gray);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .result-msg {
+    font-family: 'Lora', serif;
+    font-size: 20px;
+    color: var(--smokey-gray);
+    margin-bottom: 44px;
+    font-style: italic;
+  }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 44px;
+    text-align: left;
+  }
+  .result-card {
+    padding: 18px;
+    border-radius: 14px;
+    background: white;
+    border: 1px solid #EEE;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  }
+  .result-card-icon { font-size: 20px; margin-bottom: 6px; }
+  .result-card-name {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px;
+    color: #AAA;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .result-card-score {
+    font-family: 'Oswald', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--vol-orange);
+  }
+  .result-card-bar {
+    margin-top: 8px;
+    height: 6px;
+    background: #F0EBE3;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .result-card-fill {
+    height: 100%;
+    background: var(--vol-orange);
+    border-radius: 3px;
+    transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Confetti particles */
+  .confetti-container {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 50;
+    overflow: hidden;
+  }
+  .confetti {
+    position: absolute;
+    width: 10px; height: 10px;
+    animation: confetti-fall 3s ease-out forwards;
+  }
+
+  /* Hidden state helper */
+  .hidden { display: none !important; }
+
+  /* Mobile tweaks */
+  @media (max-width: 500px) {
+    .container { padding: 36px 16px 64px; }
+    .category-grid { gap: 8px; }
+    .cat-card { padding: 12px 8px; }
+    .results-grid { gap: 8px; }
+    .btn-primary { padding: 16px 44px; font-size: 18px; letter-spacing: 2px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-bg">
+  <div class="endzone-strip"></div>
+  <div class="endzone-strip-bottom"></div>
+  <div class="yard-lines"></div>
+
+  <div class="container">
+
+    <!-- ===== START SCREEN ===== -->
+    <div id="start-screen" class="start-screen">
+      <div class="logo-container">🏟️</div>
+      <h1 class="main-title">Tennessee</h1>
+      <p class="sub-title">Sports Trivia</p>
+
+      <div class="category-grid">
+        <div class="cat-card animate-slide-up delay-1">
+          <div class="cat-icon">🏈</div>
+          <div class="cat-name">Football</div>
+          <div class="cat-pct">50%</div>
+        </div>
+        <div class="cat-card animate-slide-up delay-2">
+          <div class="cat-icon">🏀</div>
+          <div class="cat-name">Men's Basketball</div>
+          <div class="cat-pct">25%</div>
+        </div>
+        <div class="cat-card animate-slide-up delay-3">
+          <div class="cat-icon">⚾</div>
+          <div class="cat-name">Baseball</div>
+          <div class="cat-pct">15%</div>
+        </div>
+        <div class="cat-card animate-slide-up delay-4">
+          <div class="cat-icon">🏀</div>
+          <div class="cat-name">Women's Basketball</div>
+          <div class="cat-pct">10%</div>
+        </div>
+      </div>
+
+      <div class="count-section animate-slide-up delay-4">
+        <div class="count-label">Number of Questions</div>
+        <div class="count-btns">
+          <button class="count-btn" data-count="10">10</button>
+          <button class="count-btn" data-count="20">20</button>
+          <button class="count-btn active" data-count="30">30</button>
+          <button class="count-btn" data-count="50">50</button>
+        </div>
+      </div>
+
+      <button class="btn-primary animate-slide-up delay-5" id="start-btn">Go Vols! 🍊</button>
+    </div>
+
+    <!-- ===== PLAYING SCREEN ===== -->
+    <div id="playing-screen" class="hidden">
+      <div class="progress-bar-container">
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+        <span class="progress-text progress-count" id="progress-count">1/20</span>
+        <span class="progress-text progress-score" id="progress-score">SCORE: 0</span>
+      </div>
+
+      <div id="question-area" class="animate-slide-up"></div>
+
+      <div id="feedback-area" class="hidden"></div>
+
+      <div id="next-area" class="hidden" style="text-align: center; margin-top: 28px;">
+        <button class="btn-next" id="next-btn">Next Question →</button>
+        <div class="hint-text">or press ENTER</div>
+      </div>
+    </div>
+
+    <!-- ===== RESULTS SCREEN ===== -->
+    <div id="results-screen" class="results-screen hidden"></div>
+
+  </div>
+</div>
+
+<div class="confetti-container hidden" id="confetti-container"></div>
+
+<script>
+// ============================================================
+// QUESTION BANK
+// ============================================================
+const QUESTIONS = [
+  // FOOTBALL (50% — 80 questions)
+  { id:1, cat:"Football", q:"What year did Tennessee win its most recent national championship?", opts:["1998","2001","1995","2003"], ans:"1998" },
+  { id:2, cat:"Football", q:"Who is Tennessee's all-time leading passer in career yards?", opts:["Peyton Manning","Heath Shuler","Casey Clausen","Erik Ainge"], ans:"Peyton Manning" },
+  { id:3, cat:"Football", q:"What is the seating capacity of Neyland Stadium?", opts:["About 102,000","About 95,000","About 87,000","About 110,000"], ans:"About 102,000" },
+  { id:4, cat:"Football", q:"Which coach led Tennessee to the 1998 BCS National Championship?", opts:["Phillip Fulmer","Johnny Majors","Lane Kiffin","Derek Dooley"], ans:"Phillip Fulmer" },
+  { id:5, cat:"Football", q:"What is Tennessee's famous pregame tradition where players enter the field?", opts:["The T Walk","Running Through the T","The Power T","Vol Walk"], ans:"Running Through the T" },
+  { id:6, cat:"Football", q:"Who holds the Tennessee record for most rushing yards in a single season?", opts:["Travis Henry","Jamal Lewis","Arian Foster","Travis Stephens"], ans:"Travis Henry" },
+  { id:7, cat:"Football", q:"What rivalry trophy is awarded to the winner of the Tennessee vs. Kentucky game?", opts:["The Beer Barrel","The Governor's Cup","The Bourbon Barrel","The Border Bowl"], ans:"The Beer Barrel" },
+  { id:8, cat:"Football", q:"Which Tennessee quarterback was selected #1 overall in the 1998 NFL Draft?", opts:["Peyton Manning","Heath Shuler","Tee Martin","Casey Clausen"], ans:"Peyton Manning" },
+  { id:9, cat:"Football", q:"What song do Tennessee fans sing during the 3rd quarter?", opts:["Rocky Top","Down the Field","Fight Vols Fight","Tennessee Waltz"], ans:"Rocky Top" },
+  { id:10, cat:"Football", q:"Who was Tennessee's head coach from 1977 to 1992?", opts:["Johnny Majors","Doug Dickey","Bill Battle","Phillip Fulmer"], ans:"Johnny Majors" },
+  { id:11, cat:"Football", q:"In what year did Tennessee join the SEC?", opts:["1932","1940","1921","1953"], ans:"1932" },
+  { id:12, cat:"Football", q:"Which Tennessee player finished second in the 1956 Heisman Trophy voting?", opts:["Johnny Majors","Condredge Holloway","Hank Lauricella","Bob Suffridge"], ans:"Johnny Majors" },
+  { id:13, cat:"Football", q:"What is the name of Tennessee's live Bluetick Coonhound mascot?", opts:["Smokey","Davy","Rocky","General Neyland"], ans:"Smokey" },
+  { id:14, cat:"Football", q:"Who quarterbacked Tennessee to the 1998 national title victory over Florida State?", opts:["Tee Martin","Peyton Manning","Casey Clausen","A.J. Suggs"], ans:"Tee Martin" },
+  { id:15, cat:"Football", q:"What SEC rival does Tennessee play for the 'Third Saturday in October'?", opts:["Alabama","Florida","Georgia","Auburn"], ans:"Alabama" },
+  { id:16, cat:"Football", q:"Which Tennessee wide receiver set the single-season receiving yards record in 2022?", opts:["Jalin Hyatt","Cedric Tillman","Bru McCoy","Velus Jones Jr."], ans:"Jalin Hyatt" },
+  { id:17, cat:"Football", q:"Who became Tennessee's head football coach in 2021?", opts:["Josh Heupel","Jeremy Pruitt","Butch Jones","Lane Kiffin"], ans:"Josh Heupel" },
+  { id:18, cat:"Football", q:"What was the final score when Tennessee upset Alabama in 2022?", opts:["52-49","48-45","38-35","42-41"], ans:"52-49" },
+  { id:19, cat:"Football", q:"General Robert Neyland's maxims include 'The team that makes the fewest mistakes' does what?", opts:["Wins","Scores first","Controls the clock","Dominates the line"], ans:"Wins" },
+  { id:20, cat:"Football", q:"Which undrafted Tennessee RB rushed for over 1,000 yards in 3 consecutive NFL seasons?", opts:["Arian Foster","Travis Henry","Jamal Lewis","Cordarrelle Patterson"], ans:"Arian Foster" },
+  { id:21, cat:"Football", q:"How many national championships does Tennessee football claim?", opts:["6","4","2","8"], ans:"6" },
+  { id:22, cat:"Football", q:"Who is known as the 'Minister of Defense' and played at Tennessee?", opts:["Reggie White","Leonard Little","John Henderson","Albert Haynesworth"], ans:"Reggie White" },
+  { id:23, cat:"Football", q:"What NCAA record does Tennessee hold for consecutive shutout wins?", opts:["17","15","12","20"], ans:"17" },
+  { id:24, cat:"Football", q:"Which legendary coach built Tennessee into a national power starting in 1926?", opts:["Robert Neyland","John Barnhill","Bowden Wyatt","Doug Dickey"], ans:"Robert Neyland" },
+  { id:25, cat:"Football", q:"What number jersey did Reggie White wear at Tennessee?", opts:["92","95","90","98"], ans:"92" },
+  { id:26, cat:"Football", q:"Which Tennessee player broke Reggie White's career sack record?", opts:["Derek Barnett","Jason Allen","Leonard Little","John Henderson"], ans:"Derek Barnett" },
+  { id:27, cat:"Football", q:"What bowl game did Tennessee win to cap the 2022 season?", opts:["Orange Bowl","Sugar Bowl","Citrus Bowl","Peach Bowl"], ans:"Orange Bowl" },
+  { id:28, cat:"Football", q:"Who did Tennessee defeat 31-14 in the 2022 Orange Bowl?", opts:["Clemson","Ohio State","Michigan","Penn State"], ans:"Clemson" },
+  { id:29, cat:"Football", q:"Who was Tennessee's first #1 overall NFL Draft pick in 1940?", opts:["George Cafego","Bob Suffridge","Bowden Wyatt","Hank Lauricella"], ans:"George Cafego" },
+  { id:30, cat:"Football", q:"What is the name of the marching band that leads Tennessee onto the field?", opts:["Pride of the Southland","The Volunteer Band","Big Orange Band","Spirit of Rocky Top"], ans:"Pride of the Southland" },
+  { id:31, cat:"Football", q:"Which Tennessee QB started as a backup behind Jerry Colquitt and Todd Helton in 1994?", opts:["Peyton Manning","Heath Shuler","Andy Kelly","Jeff Francis"], ans:"Peyton Manning" },
+  { id:32, cat:"Football", q:"How many career passing touchdowns did Peyton Manning throw at Tennessee?", opts:["89","101","78","65"], ans:"89" },
+  { id:33, cat:"Football", q:"What year did Neyland Stadium first open?", opts:["1921","1932","1926","1914"], ans:"1921" },
+  { id:34, cat:"Football", q:"Which Tennessee tight end became an NFL star with the Dallas Cowboys?", opts:["Jason Witten","Travis Kelce","Dallas Clark","Luke Stocker"], ans:"Jason Witten" },
+  { id:35, cat:"Football", q:"What was Tennessee's record during the 1998 national championship season?", opts:["13-0","12-1","11-2","12-0"], ans:"13-0" },
+  { id:36, cat:"Football", q:"Which Tennessee running back won a Super Bowl with the Baltimore Ravens after the 2000 season?", opts:["Jamal Lewis","Travis Henry","Arian Foster","Charlie Garner"], ans:"Jamal Lewis" },
+  { id:37, cat:"Football", q:"What conference did Tennessee belong to before the SEC?", opts:["Southern Conference","Southern Association","Independent","Southwest Conference"], ans:"Southern Conference" },
+  { id:38, cat:"Football", q:"Who was the Tennessee QB known for his cannon arm who transferred from Michigan?", opts:["Joe Milton III","Hendon Hooker","Jarrett Guarantano","J.T. Shrout"], ans:"Joe Milton III" },
+  { id:39, cat:"Football", q:"Which Tennessee coach was fired in 2010 after a 6-7 season?", opts:["Lane Kiffin","Derek Dooley","Butch Jones","Phillip Fulmer"], ans:"Lane Kiffin" },
+  { id:40, cat:"Football", q:"How many wins did Peyton Manning accumulate as a starter at Tennessee?", opts:["39","45","36","42"], ans:"39" },
+  { id:41, cat:"Football", q:"Which Tennessee defensive back won NFL Comeback Player of the Year after battling cancer?", opts:["Eric Berry","Jason Allen","Deon Grant","Dale Carter"], ans:"Eric Berry" },
+  { id:42, cat:"Football", q:"What is the name of the street where fans gather before games at Neyland Stadium?", opts:["Peyton Manning Pass","Vol Boulevard","Neyland Drive","Cumberland Avenue"], ans:"Peyton Manning Pass" },
+  { id:43, cat:"Football", q:"How many career interceptions did Eric Berry record at Tennessee?", opts:["14","18","11","9"], ans:"14" },
+  { id:44, cat:"Football", q:"Which Tennessee offensive lineman was drafted #10 overall by the Chicago Bears in 2023?", opts:["Darnell Wright","Trey Smith","Javontez Spraggins","Cade Mays"], ans:"Darnell Wright" },
+  { id:45, cat:"Football", q:"What year did Tennessee first play football?", opts:["1891","1900","1895","1886"], ans:"1891" },
+  { id:46, cat:"Football", q:"How many total NFL Draft picks has Tennessee produced (approximately)?", opts:["Over 380","Over 250","Over 300","Over 450"], ans:"Over 380" },
+  { id:47, cat:"Football", q:"Which Tennessee coach left after just one season to take the USC job in 2010?", opts:["Lane Kiffin","Derek Dooley","Butch Jones","Jim Chaney"], ans:"Lane Kiffin" },
+  { id:48, cat:"Football", q:"What did Tennessee's 1939 team famously accomplish during the regular season?", opts:["Unscored upon","Undefeated and unscored upon","Won every game by 20+","Set scoring record"], ans:"Undefeated and unscored upon" },
+  { id:49, cat:"Football", q:"Who was Tennessee's Heisman Trophy runner-up in 1951?", opts:["Hank Lauricella","Doug Atkins","Johnny Majors","Bob Neyland"], ans:"Hank Lauricella" },
+  { id:50, cat:"Football", q:"Which Hall of Fame defensive lineman played at Tennessee in the early 1950s?", opts:["Doug Atkins","Reggie White","John Henderson","Leonard Little"], ans:"Doug Atkins" },
+  { id:51, cat:"Football", q:"What was Hendon Hooker's position at Tennessee?", opts:["Quarterback","Wide Receiver","Running Back","Tight End"], ans:"Quarterback" },
+  { id:52, cat:"Football", q:"Which NFL team drafted Hendon Hooker?", opts:["Detroit Lions","Houston Texans","Indianapolis Colts","Tennessee Titans"], ans:"Detroit Lions" },
+  { id:53, cat:"Football", q:"Who was named 2024 SEC Offensive Player of the Year from Tennessee?", opts:["Dylan Sampson","Nico Iamaleava","Squirrel White","Dont'e Thornton"], ans:"Dylan Sampson" },
+  { id:54, cat:"Football", q:"What is the approximate all-time winning percentage of Tennessee football?", opts:[".670",".580",".720",".610"], ans:".670" },
+  { id:55, cat:"Football", q:"Which Tennessee edge rusher was drafted #26 overall by the Atlanta Falcons in 2025?", opts:["James Pearce Jr.","Tyler Baron","Byron Young","Omari Thomas"], ans:"James Pearce Jr." },
+  { id:56, cat:"Football", q:"How many SEC championships has Tennessee football won?", opts:["16","13","10","20"], ans:"16" },
+  { id:57, cat:"Football", q:"What was Condredge Holloway notable for being at Tennessee?", opts:["First Black QB in SEC","First walk-on to start","Tallest QB ever","First left-handed QB"], ans:"First Black QB in SEC" },
+  { id:58, cat:"Football", q:"Which Tennessee running back set the school record with 22 touchdowns in 2024?", opts:["Dylan Sampson","Jaylen Wright","Jabari Small","Tiyon Evans"], ans:"Dylan Sampson" },
+  { id:59, cat:"Football", q:"Where does Neyland Stadium rank among the largest stadiums in the U.S.?", opts:["6th largest","2nd largest","10th largest","4th largest"], ans:"6th largest" },
+  { id:60, cat:"Football", q:"What year did Tennessee win the AP Poll national championship before 1998?", opts:["1951","1967","1956","1942"], ans:"1951" },
+  { id:61, cat:"Football", q:"Which Tennessee player had the single-season sack record of 15?", opts:["Reggie White","Derek Barnett","Leonard Little","John Henderson"], ans:"Reggie White" },
+  { id:62, cat:"Football", q:"Who was named Orange Bowl MVP after Tennessee's 2022 bowl win?", opts:["Joe Milton III","Hendon Hooker","Jaylen Wright","Cedric Tillman"], ans:"Joe Milton III" },
+  { id:63, cat:"Football", q:"What did Johnny Majors do before returning to coach at Tennessee?", opts:["Coached at Pitt","Played in the NFL","Coached at Alabama","Coached at Vanderbilt"], ans:"Coached at Pitt" },
+  { id:64, cat:"Football", q:"Which WR set a Tennessee record with six 100-yard receiving games in 2006?", opts:["Robert Meachem","Jayson Swain","Bret Smith","Josh Briscoe"], ans:"Robert Meachem" },
+  { id:65, cat:"Football", q:"How many times has Tennessee been ranked #1 in the AP Poll (total weeks)?", opts:["18","25","10","32"], ans:"18" },
+  { id:66, cat:"Football", q:"What is the name of the checkerboard pattern fans create in Neyland Stadium?", opts:["Checker Neyland","The Checkerboard","Orange and White Out","Vol Block"], ans:"Checker Neyland" },
+  { id:67, cat:"Football", q:"Approximately how many home wins does Tennessee have at Neyland Stadium?", opts:["Over 480","Over 350","Over 400","Over 550"], ans:"Over 480" },
+  { id:68, cat:"Football", q:"Which Tennessee QB led the team to a 45-42 road win at Kentucky in 2021?", opts:["Hendon Hooker","Joe Milton III","Harrison Bailey","Brian Maurer"], ans:"Hendon Hooker" },
+  { id:69, cat:"Football", q:"In 1991 three Tennessee offensive players were drafted in the first round. What positions?", opts:["Two OTs and a WR","Two WRs and a QB","A QB and two RBs","A TE and two OTs"], ans:"Two OTs and a WR" },
+  { id:70, cat:"Football", q:"Who replaced Phillip Fulmer as Tennessee's head coach in 2009?", opts:["Lane Kiffin","Derek Dooley","Butch Jones","Jim Chaney"], ans:"Lane Kiffin" },
+  { id:71, cat:"Football", q:"What is Neyland Stadium's popular unofficial nickname among fans?", opts:["The Concrete Volcano","America's Stadium","The Third Largest City in Tennessee","The Big Orange"], ans:"The Third Largest City in Tennessee" },
+  { id:72, cat:"Football", q:"What Tennessee RB was drafted by the Cleveland Browns in 2025?", opts:["Dylan Sampson","Jaylen Wright","Jabari Small","Len'Neth Whitehead"], ans:"Dylan Sampson" },
+  { id:73, cat:"Football", q:"Who was the first African-American football player to letter at Tennessee?", opts:["Lester McClain","Condredge Holloway","Jackie Walker","Andy Bennett"], ans:"Lester McClain" },
+  { id:74, cat:"Football", q:"Which Tennessee football coach won the Steve Spurrier First-Year Coach Award in 2021?", opts:["Josh Heupel","Lane Kiffin","Derek Dooley","Butch Jones"], ans:"Josh Heupel" },
+  { id:75, cat:"Football", q:"How many career yards did Peyton Manning throw for at Tennessee?", opts:["About 11,200","About 9,800","About 8,500","About 12,600"], ans:"About 11,200" },
+  { id:76, cat:"Football", q:"What bowl game did Tennessee play in after the 2023 season?", opts:["Citrus Bowl","Orange Bowl","Music City Bowl","Sugar Bowl"], ans:"Citrus Bowl" },
+  { id:77, cat:"Football", q:"Who did Tennessee defeat 35-0 in the 2023 Citrus Bowl?", opts:["Iowa","Wisconsin","Kentucky","Northwestern"], ans:"Iowa" },
+  { id:78, cat:"Football", q:"Which Tennessee WR caught for a school single-season record of 1298 yards in 2006?", opts:["Robert Meachem","Carl Pickens","Marcus Nash","Joey Kent"], ans:"Robert Meachem" },
+  { id:79, cat:"Football", q:"What is the name of Tennessee's costumed mascot (not the live dog)?", opts:["The Volunteer","Davy Crockett","Captain Vol","Smokey Jr."], ans:"The Volunteer" },
+  { id:80, cat:"Football", q:"How many coaching wins did Robert Neyland accumulate at Tennessee?", opts:["173","200","150","190"], ans:"173" },
+
+  // MEN'S BASKETBALL (25% — 40 questions)
+  { id:81, cat:"Men's Basketball", q:"Which Tennessee men's basketball coach led the Vols to the 2010 Elite Eight?", opts:["Bruce Pearl","Buzz Peterson","Donnie Tyndall","Rick Barnes"], ans:"Bruce Pearl" },
+  { id:82, cat:"Men's Basketball", q:"Who is Tennessee's all-time leading scorer in men's basketball?", opts:["Allan Houston","Chris Lofton","Dale Ellis","Bernard King"], ans:"Allan Houston" },
+  { id:83, cat:"Men's Basketball", q:"What arena do the Tennessee Vols men's basketball team play in?", opts:["Thompson-Boling Arena","Stokely Athletics Center","Food City Center","Vol Coliseum"], ans:"Thompson-Boling Arena" },
+  { id:84, cat:"Men's Basketball", q:"Which Vol was the #1 overall pick in the 1977 NBA Draft?", opts:["Bernard King","Ernie Grunfeld","Dale Ellis","Allan Houston"], ans:"Bernard King" },
+  { id:85, cat:"Men's Basketball", q:"Who became Tennessee's head men's basketball coach in 2015?", opts:["Rick Barnes","Bruce Pearl","Donnie Tyndall","Cuonzo Martin"], ans:"Rick Barnes" },
+  { id:86, cat:"Men's Basketball", q:"In what year did Tennessee first reach #1 in the AP men's basketball poll?", opts:["2008","2010","2019","2000"], ans:"2008" },
+  { id:87, cat:"Men's Basketball", q:"Which Tennessee guard was a two-time All-American known for clutch shooting in the mid-2000s?", opts:["Chris Lofton","J.P. Prince","Tyler Smith","Wayne Chism"], ans:"Chris Lofton" },
+  { id:88, cat:"Men's Basketball", q:"What nickname was given to Bernard King and Ernie Grunfeld at Tennessee?", opts:["The Bernie and Ernie Show","The Dynamic Duo","The Vol Express","King and Prince"], ans:"The Bernie and Ernie Show" },
+  { id:89, cat:"Men's Basketball", q:"Which Tennessee player was SEC Player of the Year in both 2018 and 2019?", opts:["Grant Williams","Admiral Schofield","Jordan Bone","Lamonte Turner"], ans:"Grant Williams" },
+  { id:90, cat:"Men's Basketball", q:"How many SEC regular season titles has Tennessee men's basketball won (through 2024)?", opts:["11","5","8","15"], ans:"11" },
+  { id:91, cat:"Men's Basketball", q:"Who was the first coach to take Tennessee to the NCAA Tournament?", opts:["Ray Mears","Don DeVoe","Bruce Pearl","Wade Houston"], ans:"Ray Mears" },
+  { id:92, cat:"Men's Basketball", q:"What year did Tennessee win its first SEC Tournament title in men's basketball?", opts:["1936","1943","1951","1967"], ans:"1936" },
+  { id:93, cat:"Men's Basketball", q:"Which Tennessee coach was the first African-American head coach in SEC history?", opts:["Wade Houston","Cuonzo Martin","Donnie Tyndall","Jerry Green"], ans:"Wade Houston" },
+  { id:94, cat:"Men's Basketball", q:"What was the original basketball arena before Thompson-Boling?", opts:["Stokely Athletic Center","Armory Fieldhouse","Memorial Gym","Vol Arena"], ans:"Stokely Athletic Center" },
+  { id:95, cat:"Men's Basketball", q:"How many seats does Thompson-Boling Arena hold (approximately)?", opts:["About 21,600","About 18,000","About 25,000","About 15,000"], ans:"About 21,600" },
+  { id:96, cat:"Men's Basketball", q:"Which Tennessee guard became the program's all-time assists leader?", opts:["Zakai Zeigler","Chris Lofton","Allan Houston","Dane Bradshaw"], ans:"Zakai Zeigler" },
+  { id:97, cat:"Men's Basketball", q:"Who won SEC Tournament MVP when Tennessee won the 2022 SEC Tournament?", opts:["Kennedy Chandler","Santiago Vescovi","Josiah-Jordan James","Zakai Zeigler"], ans:"Kennedy Chandler" },
+  { id:98, cat:"Men's Basketball", q:"What year did Tennessee win the SEC Tournament for the first time in 43 years?", opts:["2022","2019","2018","2023"], ans:"2022" },
+  { id:99, cat:"Men's Basketball", q:"Which Tennessee player won SEC Defensive Player of the Year in 2020 — the first in program history?", opts:["Yves Pons","Grant Williams","Lamonte Turner","John Fulkerson"], ans:"Yves Pons" },
+  { id:100, cat:"Men's Basketball", q:"What coach led Tennessee to the 1967 SEC championship and first NCAA Tournament?", opts:["Ray Mears","Don DeVoe","Stu Aberdeen","Emmett Lowery"], ans:"Ray Mears" },
+  { id:101, cat:"Men's Basketball", q:"Which Vol forward earned All-American honors in the 1982-83 season?", opts:["Dale Ellis","Reggie Johnson","Michael Brooks","Howard Wood"], ans:"Dale Ellis" },
+  { id:102, cat:"Men's Basketball", q:"How many consecutive weeks was Tennessee ranked #1 in the AP Poll during 2018-19?", opts:["4","6","2","8"], ans:"4" },
+  { id:103, cat:"Men's Basketball", q:"Which Tennessee transfer won the Jerry West Award as the nation's best shooting guard in 2024-25?", opts:["Chaz Lanier","Dalton Knecht","Zakai Zeigler","Santiago Vescovi"], ans:"Chaz Lanier" },
+  { id:104, cat:"Men's Basketball", q:"How many times has Tennessee men's basketball reached the Elite Eight?", opts:["3","2","1","4"], ans:"3" },
+  { id:105, cat:"Men's Basketball", q:"Which Tennessee player was the SEC Newcomer of the Year and an All-American in 2023-24?", opts:["Dalton Knecht","Chaz Lanier","Jonas Aidoo","Josiah-Jordan James"], ans:"Dalton Knecht" },
+  { id:106, cat:"Men's Basketball", q:"Who was Tennessee's head coach before Bruce Pearl?", opts:["Buzz Peterson","Jerry Green","Cuonzo Martin","Wade Houston"], ans:"Buzz Peterson" },
+  { id:107, cat:"Men's Basketball", q:"What Tennessee guard is the program's career leader in steals?", opts:["Zakai Zeigler","Chris Lofton","Allan Houston","Tony White"], ans:"Zakai Zeigler" },
+  { id:108, cat:"Men's Basketball", q:"Which coach took Tennessee to the Sweet Sixteen in 2014 before leaving for Cal?", opts:["Cuonzo Martin","Donnie Tyndall","Bruce Pearl","Jerry Green"], ans:"Cuonzo Martin" },
+  { id:109, cat:"Men's Basketball", q:"How many wins did Rick Barnes record in 2018-19 (tying a school record)?", opts:["31","28","33","25"], ans:"31" },
+  { id:110, cat:"Men's Basketball", q:"Which Tennessee player rallied the Vols from 17 down at #6 Kentucky in 2019-20?", opts:["John Fulkerson","Yves Pons","Santiago Vescovi","Lamonte Turner"], ans:"John Fulkerson" },
+  { id:111, cat:"Men's Basketball", q:"What was the capacity of Thompson-Boling Arena when it opened — the largest basketball-specific arena at the time?", opts:["Over 24,500","About 20,000","About 19,000","About 22,000"], ans:"Over 24,500" },
+  { id:112, cat:"Men's Basketball", q:"Which Tennessee player is the only Vol inducted into the Naismith Basketball Hall of Fame?", opts:["Bernard King","Allan Houston","Dale Ellis","Ernie Grunfeld"], ans:"Bernard King" },
+  { id:113, cat:"Men's Basketball", q:"Who was Tennessee's SEC Tournament MVP in 1979 when the Vols beat Kentucky?", opts:["Reggie Johnson","Bernard King","Ernie Grunfeld","Dale Ellis"], ans:"Reggie Johnson" },
+  { id:114, cat:"Men's Basketball", q:"What year did Tennessee men's basketball first appear in the AP Poll at #1?", opts:["2008","2018","2019","2010"], ans:"2008" },
+  { id:115, cat:"Men's Basketball", q:"How many NBA players has Rick Barnes produced at Tennessee (through 2025)?", opts:["12","8","15","6"], ans:"12" },
+  { id:116, cat:"Men's Basketball", q:"Which Tennessee guard won SEC Defensive Player of the Year in both 2024 and 2025?", opts:["Zakai Zeigler","Jahmai Mashack","Josiah-Jordan James","Yves Pons"], ans:"Zakai Zeigler" },
+  { id:117, cat:"Men's Basketball", q:"Who was Tennessee's leading scorer during the 2007-08 team that reached #1?", opts:["Chris Lofton","Tyler Smith","Wayne Chism","JaJuan Smith"], ans:"Chris Lofton" },
+  { id:118, cat:"Men's Basketball", q:"How many wins did Tennessee post in 2024-25 when they reached the Elite Eight?", opts:["30","27","32","25"], ans:"30" },
+  { id:119, cat:"Men's Basketball", q:"What was unique about Tennessee at the start of the 2024-25 season?", opts:["Last unbeaten team in the nation","Won 20 straight road games","Had three lottery picks","Scored 100+ in five games"], ans:"Last unbeaten team in the nation" },
+  { id:120, cat:"Men's Basketball", q:"Which coach held the most wins at Tennessee before Rick Barnes's era?", opts:["Ray Mears","Don DeVoe","Bruce Pearl","Wade Houston"], ans:"Ray Mears" },
+
+  // BASEBALL (15% — 24 questions)
+  { id:121, cat:"Baseball", q:"What is the name of Tennessee's baseball stadium?", opts:["Lindsey Nelson Stadium","Engel Stadium","Vol Baseball Park","Smokey Diamond"], ans:"Lindsey Nelson Stadium" },
+  { id:122, cat:"Baseball", q:"In what year did Tennessee baseball first reach the College World Series?", opts:["1951","1961","1971","1941"], ans:"1951" },
+  { id:123, cat:"Baseball", q:"Which coach led Tennessee baseball to CWS appearances in 2001 and 2005?", opts:["Rod Delmonico","Todd Raleigh","Tony Vitello","Dave Serrano"], ans:"Rod Delmonico" },
+  { id:124, cat:"Baseball", q:"Who became Tennessee's baseball head coach in 2018 and revitalized the program?", opts:["Tony Vitello","Dave Serrano","Rod Delmonico","Todd Raleigh"], ans:"Tony Vitello" },
+  { id:125, cat:"Baseball", q:"What year did Tennessee win its first College World Series national championship?", opts:["2024","2021","2022","2023"], ans:"2024" },
+  { id:126, cat:"Baseball", q:"Which former Tennessee athlete was both a football QB and first-round MLB Draft pick?", opts:["Todd Helton","R.A. Dickey","Luke Hochevar","Chris Burke"], ans:"Todd Helton" },
+  { id:127, cat:"Baseball", q:"Who was named CWS Most Outstanding Player when Tennessee won the 2024 title?", opts:["Dylan Dreiling","Christian Moore","Zander Sechrist","Blake Burke"], ans:"Dylan Dreiling" },
+  { id:128, cat:"Baseball", q:"What historic feat did Christian Moore accomplish during the 2024 CWS?", opts:["Hit for the cycle","Hit 5 home runs","Pitched a shutout","Stole 6 bases"], ans:"Hit for the cycle" },
+  { id:129, cat:"Baseball", q:"How many games did Tennessee win during the record-setting 2024 season?", opts:["60","57","55","62"], ans:"60" },
+  { id:130, cat:"Baseball", q:"Who did Tennessee defeat in the 2024 CWS Finals?", opts:["Texas A&M","Florida State","Virginia","LSU"], ans:"Texas A&M" },
+  { id:131, cat:"Baseball", q:"What was the final score of the deciding Game 3 of the 2024 CWS Finals?", opts:["6-5","4-3","8-7","10-9"], ans:"6-5" },
+  { id:132, cat:"Baseball", q:"Which Tennessee pitcher won the Roger Clemens Award in 2005?", opts:["Luke Hochevar","R.A. Dickey","Todd Helton","James Adkins"], ans:"Luke Hochevar" },
+  { id:133, cat:"Baseball", q:"What overall draft pick was Luke Hochevar in the 2006 MLB Draft?", opts:["#1 overall","#3 overall","#5 overall","#10 overall"], ans:"#1 overall" },
+  { id:134, cat:"Baseball", q:"How many CWS appearances has Tennessee baseball made through 2024?", opts:["7","5","4","9"], ans:"7" },
+  { id:135, cat:"Baseball", q:"Tennessee was the first #1 seed to win the CWS since what year?", opts:["1999","2003","2005","1997"], ans:"1999" },
+  { id:136, cat:"Baseball", q:"What record did Tennessee set as the first SEC team to accomplish in 2024?", opts:["Win 60 games in a season","Have 10 All-Americans","Go undefeated at home","Win 25 straight"], ans:"Win 60 games in a season" },
+  { id:137, cat:"Baseball", q:"Which Tennessee pitcher threw key starts in the 2024 CWS and had been a midweek starter earlier?", opts:["Zander Sechrist","Aaron Combs","Kirby Connell","Chase Burns"], ans:"Zander Sechrist" },
+  { id:138, cat:"Baseball", q:"How many home runs did Tennessee hit in the 2024 season (approximately)?", opts:["184","158","120","200"], ans:"184" },
+  { id:139, cat:"Baseball", q:"Which Tennessee pitcher set the school record with 47.2 consecutive scoreless innings in 1994?", opts:["Todd Helton","R.A. Dickey","Jason Emerton","Chad Hawkins"], ans:"Todd Helton" },
+  { id:140, cat:"Baseball", q:"What was Dylan Dreiling's historic feat during the 2024 CWS Finals?", opts:["Home run in all 3 games","Grand slam in Game 3","No-hit innings","5-for-5 in Game 1"], ans:"Home run in all 3 games" },
+  { id:141, cat:"Baseball", q:"Who is Tennessee's current baseball head coach following Tony Vitello's departure?", opts:["Josh Elander","Ross Kivett","Frank Anderson","Drew Gilbert"], ans:"Josh Elander" },
+  { id:142, cat:"Baseball", q:"Which Tennessee catcher was a first-round MLB Draft pick in 2005?", opts:["J.P. Arencibia","Todd Helton","Ed Bailey","Drew Gilbert"], ans:"J.P. Arencibia" },
+  { id:143, cat:"Baseball", q:"In 2022 Tennessee set a program record with how many wins?", opts:["57","53","60","48"], ans:"57" },
+  { id:144, cat:"Baseball", q:"Which Tennessee outfielder was drafted in the first round by the Colorado Rockies in 2022?", opts:["Jordan Beck","Drew Gilbert","Blake Burke","Christian Moore"], ans:"Jordan Beck" },
+
+  // WOMEN'S BASKETBALL (10% — 16 questions)
+  { id:145, cat:"Women's Basketball", q:"How many NCAA Women's Basketball Championships did Pat Summitt win?", opts:["8","6","10","7"], ans:"8" },
+  { id:146, cat:"Women's Basketball", q:"What year did Pat Summitt become Tennessee's women's basketball head coach?", opts:["1974","1978","1980","1972"], ans:"1974" },
+  { id:147, cat:"Women's Basketball", q:"Which Lady Vol is the program's all-time leading scorer with 3,025 points?", opts:["Chamique Holdsclaw","Tamika Catchings","Candace Parker","Bridgette Gordon"], ans:"Chamique Holdsclaw" },
+  { id:148, cat:"Women's Basketball", q:"How many career wins did Pat Summitt accumulate at Tennessee?", opts:["1,098","985","1,050","900"], ans:"1,098" },
+  { id:149, cat:"Women's Basketball", q:"What was Tennessee's record during the historic undefeated 1997-98 season?", opts:["39-0","35-0","38-1","36-0"], ans:"39-0" },
+  { id:150, cat:"Women's Basketball", q:"Which Lady Vol was the first woman to dunk in an NCAA Tournament game?", opts:["Candace Parker","Chamique Holdsclaw","Tamika Catchings","Glory Johnson"], ans:"Candace Parker" },
+  { id:151, cat:"Women's Basketball", q:"How many Final Four appearances did Pat Summitt's teams make?", opts:["18","15","12","20"], ans:"18" },
+  { id:152, cat:"Women's Basketball", q:"In what years did Tennessee win three consecutive national championships?", opts:["1996-1998","1987-1989","2006-2008","1991-1993"], ans:"1996-1998" },
+  { id:153, cat:"Women's Basketball", q:"Which Lady Vol holds the record for most points as a freshman with 711?", opts:["Tamika Catchings","Candace Parker","Chamique Holdsclaw","Kara Lawson"], ans:"Tamika Catchings" },
+  { id:154, cat:"Women's Basketball", q:"What disease did Pat Summitt announce she was diagnosed with in 2011?", opts:["Early-onset Alzheimer's","Parkinson's","ALS","Multiple sclerosis"], ans:"Early-onset Alzheimer's" },
+  { id:155, cat:"Women's Basketball", q:"Who was the first Lady Vol to have her jersey retired (#22)?", opts:["Holly Warlick","Chamique Holdsclaw","Pat Summitt","Daedra Charles"], ans:"Holly Warlick" },
+  { id:156, cat:"Women's Basketball", q:"Which Lady Vol guard is second all-time in three-pointers made at Tennessee?", opts:["Kara Lawson","Dena Head","Michelle Marciniak","Shekinna Stricklen"], ans:"Kara Lawson" },
+  { id:157, cat:"Women's Basketball", q:"Who won the Wade Trophy as the nation's best women's player in 1991 from Tennessee?", opts:["Daedra Charles","Bridgette Gordon","Chamique Holdsclaw","Dena Head"], ans:"Daedra Charles" },
+  { id:158, cat:"Women's Basketball", q:"Which team was Tennessee's biggest women's basketball rival coached by Geno Auriemma?", opts:["UConn","Stanford","Louisiana Tech","Duke"], ans:"UConn" },
+  { id:159, cat:"Women's Basketball", q:"Who succeeded Pat Summitt as Tennessee's women's basketball head coach in 2012?", opts:["Holly Warlick","Kellie Harper","Nikki Caldwell","Mickie DeMoss"], ans:"Holly Warlick" },
+  { id:160, cat:"Women's Basketball", q:"Which Lady Vol set 11 records in a single season including scoring 51 points in a game?", opts:["Trish Roberts","Mary Ostrowski","Holly Warlick","Daedra Charles"], ans:"Trish Roberts" },
+];
+
+const CAT_META = {
+  "Football":           { icon:"🏈", pill:"pill-football" },
+  "Men's Basketball":   { icon:"🏀", pill:"pill-mbball" },
+  "Baseball":           { icon:"⚾", pill:"pill-baseball" },
+  "Women's Basketball": { icon:"🏀", pill:"pill-wbball" },
+};
+
+const CAT_WEIGHTS = { "Football":0.50, "Men's Basketball":0.25, "Baseball":0.15, "Women's Basketball":0.10 };
+
+// ============================================================
+// HELPERS
+// ============================================================
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function generateQuiz(n) {
+  const bycat = {};
+  QUESTIONS.forEach(q => { (bycat[q.cat] = bycat[q.cat] || []).push(q); });
+  const sel = [];
+  for (const [cat, w] of Object.entries(CAT_WEIGHTS)) {
+    const count = Math.max(1, Math.round(n * w));
+    sel.push(...shuffle(bycat[cat] || []).slice(0, count));
+  }
+  return shuffle(sel).slice(0, n);
+}
+
+// ============================================================
+// APP STATE
+// ============================================================
+let questionCount = 30;
+let questions = [];
+let currentIdx = 0;
+let score = 0;
+let answers = [];
+let answered = false;
+
+// DOM refs
+const $start   = document.getElementById('start-screen');
+const $playing  = document.getElementById('playing-screen');
+const $results  = document.getElementById('results-screen');
+const $progFill = document.getElementById('progress-fill');
+const $progCnt  = document.getElementById('progress-count');
+const $progScr  = document.getElementById('progress-score');
+const $qArea    = document.getElementById('question-area');
+const $fbArea   = document.getElementById('feedback-area');
+const $nextArea = document.getElementById('next-area');
+const $nextBtn  = document.getElementById('next-btn');
+const $confetti = document.getElementById('confetti-container');
+
+// ============================================================
+// SCREEN TRANSITIONS
+// ============================================================
+function showScreen(id) {
+  [$start, $playing, $results].forEach(el => el.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+// ============================================================
+// QUESTION COUNT BUTTONS
+// ============================================================
+document.querySelectorAll('.count-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.count-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    questionCount = parseInt(btn.dataset.count);
+  });
+});
+
+// ============================================================
+// START GAME
+// ============================================================
+document.getElementById('start-btn').addEventListener('click', startGame);
+
+function startGame() {
+  questions = generateQuiz(questionCount);
+  currentIdx = 0;
+  score = 0;
+  answers = [];
+  answered = false;
+  showScreen('playing-screen');
+  renderQuestion();
+}
+
+// ============================================================
+// RENDER QUESTION
+// ============================================================
+function renderQuestion() {
+  const q = questions[currentIdx];
+  const meta = CAT_META[q.cat];
+  answered = false;
+
+  // Progress
+  $progFill.style.width = `${((currentIdx + 1) / questions.length) * 100}%`;
+  $progCnt.textContent = `${currentIdx + 1}/${questions.length}`;
+  $progScr.textContent = `SCORE: ${score}`;
+
+  // Question
+  $qArea.className = 'animate-slide-up';
+  $qArea.innerHTML = `
+    <div class="category-pill ${meta.pill}">
+      <span>${meta.icon}</span> ${q.cat}
+    </div>
+    <h2 class="question-text">${q.q}</h2>
+    <div class="options-grid">
+      ${q.opts.map((o, i) => `
+        <button class="option-btn" data-opt="${o}">
+          <span class="option-letter">${String.fromCharCode(65 + i)}</span>
+          <span>${o}</span>
+        </button>
+      `).join('')}
+    </div>
+  `;
+
+  // Bind click
+  $qArea.querySelectorAll('.option-btn').forEach(btn => {
+    btn.addEventListener('click', () => handleAnswer(btn.dataset.opt));
+  });
+
+  // Hide feedback & next
+  $fbArea.classList.add('hidden');
+  $nextArea.classList.add('hidden');
+
+  // Force reflow for animation
+  void $qArea.offsetWidth;
+}
+
+// ============================================================
+// HANDLE ANSWER
+// ============================================================
+function handleAnswer(selected) {
+  if (answered) return;
+  answered = true;
+  const q = questions[currentIdx];
+  const isCorrect = selected === q.ans;
+  if (isCorrect) score++;
+  answers.push(selected);
+
+  $progScr.textContent = `SCORE: ${score}`;
+
+  // Style options
+  $qArea.querySelectorAll('.option-btn').forEach(btn => {
+    btn.classList.add('answered');
+    const val = btn.dataset.opt;
+    if (val === q.ans) btn.classList.add('correct');
+    else if (val === selected && !isCorrect) btn.classList.add('wrong');
+    else btn.classList.add('dimmed');
+  });
+
+  // Feedback
+  $fbArea.className = `feedback animate-fade ${isCorrect ? 'feedback-correct' : 'feedback-wrong'}`;
+  $fbArea.textContent = isCorrect ? '🎉 That\'s correct!' : `The correct answer is: ${q.ans}`;
+  $fbArea.classList.remove('hidden');
+
+  // Next btn
+  $nextBtn.textContent = currentIdx + 1 >= questions.length ? 'See Results' : 'Next Question →';
+  $nextArea.classList.remove('hidden');
+  $nextArea.className = 'animate-fade';
+  $nextArea.style.textAlign = 'center';
+  $nextArea.style.marginTop = '28px';
+}
+
+// ============================================================
+// NEXT QUESTION / RESULTS
+// ============================================================
+$nextBtn.addEventListener('click', goNext);
+
+function goNext() {
+  if (currentIdx + 1 >= questions.length) {
+    showResults();
+  } else {
+    currentIdx++;
+    renderQuestion();
+  }
+}
+
+// Keyboard
+document.addEventListener('keydown', (e) => {
+  if ($playing.classList.contains('hidden')) return;
+  if (!answered && e.key >= '1' && e.key <= '4') {
+    const btns = $qArea.querySelectorAll('.option-btn');
+    const idx = parseInt(e.key) - 1;
+    if (btns[idx]) handleAnswer(btns[idx].dataset.opt);
+  }
+  if (answered && (e.key === 'Enter' || e.key === ' ')) {
+    e.preventDefault();
+    goNext();
+  }
+});
+
+// ============================================================
+// RESULTS
+// ============================================================
+function showResults() {
+  showScreen('results-screen');
+
+  const pct = Math.round((score / questions.length) * 100);
+  let msg, emoji;
+  if (pct === 100)     { msg = "PERFECT! You're a true Vol!"; emoji = "🏆"; }
+  else if (pct >= 80)  { msg = "Great job, Vol fan!"; emoji = "🔥"; }
+  else if (pct >= 60)  { msg = "Not bad! Keep studying!"; emoji = "📚"; }
+  else if (pct >= 40)  { msg = "Room for improvement!"; emoji = "💪"; }
+  else                 { msg = "Time to hit the history books!"; emoji = "📖"; }
+
+  // Category breakdown
+  const catScores = {};
+  questions.forEach((q, i) => {
+    if (!catScores[q.cat]) catScores[q.cat] = { correct: 0, total: 0 };
+    catScores[q.cat].total++;
+    if (answers[i] === q.ans) catScores[q.cat].correct++;
+  });
+
+  $results.innerHTML = `
+    <div class="animate-scale">
+      <div class="result-emoji">${emoji}</div>
+      <div class="result-score">${score} / ${questions.length}</div>
+      <div class="result-pct">${pct}%</div>
+      <div class="result-msg">${msg}</div>
+    </div>
+    <div class="results-grid">
+      ${Object.entries(catScores).map(([cat, s], i) => {
+        const catPct = s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0;
+        return `
+          <div class="result-card animate-slide-up delay-${i+1}">
+            <div class="result-card-icon">${CAT_META[cat]?.icon || '🏅'}</div>
+            <div class="result-card-name">${cat}</div>
+            <div class="result-card-score">${s.correct}/${s.total}</div>
+            <div class="result-card-bar">
+              <div class="result-card-fill" style="width: 0%" data-target="${catPct}"></div>
+            </div>
+          </div>`;
+      }).join('')}
+    </div>
+    <button class="btn-primary" id="restart-btn">Play Again 🍊</button>
+  `;
+
+  // Animate bars after a beat
+  setTimeout(() => {
+    $results.querySelectorAll('.result-card-fill').forEach(bar => {
+      bar.style.width = bar.dataset.target + '%';
+    });
+  }, 300);
+
+  // Restart
+  document.getElementById('restart-btn').addEventListener('click', () => {
+    showScreen('start-screen');
+  });
+
+  // Confetti if good score
+  if (pct >= 80) spawnConfetti();
+}
+
+// ============================================================
+// CONFETTI
+// ============================================================
+function spawnConfetti() {
+  $confetti.classList.remove('hidden');
+  $confetti.innerHTML = '';
+  const colors = ['#FF8200', '#FFFFFF', '#FFB74D', '#58595B', '#FF6D00'];
+  for (let i = 0; i < 60; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.style.left = Math.random() * 100 + '%';
+    el.style.top = Math.random() * -20 + '%';
+    el.style.background = colors[Math.floor(Math.random() * colors.length)];
+    el.style.width = (6 + Math.random() * 8) + 'px';
+    el.style.height = (6 + Math.random() * 8) + 'px';
+    el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    el.style.animationDuration = (2 + Math.random() * 2) + 's';
+    el.style.animationDelay = Math.random() * 1.5 + 's';
+    $confetti.appendChild(el);
+  }
+  setTimeout(() => $confetti.classList.add('hidden'), 5000);
+}
+</script>
+</body>
+</html>
